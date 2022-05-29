@@ -1,0 +1,75 @@
+:root {
+    font-family: 'Bebas Neue', serif;
+    font-size: 16px;
+    --shadows: 0px 1px 4px rgba(0, 0, 0, 0.16);
+    --background-color: #CEEFDD;
+}
+
+h1, h2, p {
+    font-size: inherit;
+    margin: 0;
+}
+
+body {
+    margin: 0;
+    background-color: var(--background-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    padding: 50px;
+}
+
+.header h1 {
+    font-size: 5rem;
+    text-align: center;
+}
+
+.main-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player-select {
+    height: 300px;
+    width: 400px;
+    background-color: white;
+    font-size: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadows);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.player-select button {
+    font: inherit;
+    width: 120px;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 0;
+    background-color: var(--background-color);
+}
+
+.player-select button:hover {
+    filter: brightness(95%);
+    cursor: pointer;
+}
+
+.player-choice {
+    display: flex;
+    gap: 30px;
+}
+
+.player-choice button {
+    background-color: #CEE0EF;
+}
+
+
+.hidden {
+    display: none;
+}
