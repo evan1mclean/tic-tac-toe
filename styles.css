@@ -3,6 +3,7 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 :root {
     font-family: 'Bebas Neue', serif;
     font-size: 16px;
@@ -36,16 +37,17 @@ body {
 }
 
 .player-select-screen {
-    height: 300px;
     width: 400px;
+    padding: 20px;
     background-color: white;
     font-size: var(--content-font-size);
     border-radius: var(--global-border-radius);
     box-shadow: var(--shadows);
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
+    gap: 50px;
 }
 
 .player-select-screen button {
@@ -73,7 +75,6 @@ body {
 
 .game-content-screen {
     height: 100%;
-    font-size: var(--content-font-size);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -104,6 +105,11 @@ body {
     border-right: none;
 }
 
+.tile:hover {
+    background-color: #eeeeee;
+    cursor: pointer;
+}
+
 .scoreboard {
     width: 400px;
     height: 100px;
@@ -115,7 +121,12 @@ body {
     text-align: center;
 }
 
+.scoreboard h2 {
+    font-size: var(--content-font-size);
+}
+
 .scoreboard p {
+    font-size: var(--content-font-size);
     margin-top: 1rem;
 }
 
