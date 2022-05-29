@@ -95,6 +95,10 @@ body {
 
 .tile {
     border-right: 2px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4rem;
 }
 
 .tile:nth-child(n + 4) {
