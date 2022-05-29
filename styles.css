@@ -1,6 +1,7 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 :root {
     font-family: 'Bebas Neue', serif;
@@ -12,13 +13,7 @@
     --content-font-size: 1.5rem;
 }
 
-h1, h2, p {
-    font-size: inherit;
-    margin: 0;
-}
-
 body {
-    margin: 0;
     background-color: var(--background-color);
     display: flex;
     flex-direction: column;
