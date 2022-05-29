@@ -16,13 +16,38 @@
         <h1>Tic Tac Toe</h1>
     </div>
     <div class="main-content">
-        <div class="player-select">
+        <div class="player-select-screen hidden">
             <h2>Select Opponent:</h2>
             <div class="player-choice">
                 <button id="botButton">Bot</button>
                 <button id="humanButton">Human</button>
             </div>
             <button id="startGameButton">Start Game</button>
+        </div>
+        <div class="game-content-screen">
+            <div class="gameboard">
+                <div class="tile" data-index="1"></div>
+                <div class="tile" data-index="2"></div>
+                <div class="tile" data-index="3"></div>
+                <div class="tile" data-index="4"></div>
+                <div class="tile" data-index="5"></div>
+                <div class="tile" data-index="6"></div>
+                <div class="tile" data-index="7"></div>
+                <div class="tile" data-index="8"></div>
+                <div class="tile" data-index="9"></div>
+            </div>
+            <div class="scoreboard">
+                <div class="player-1-score">
+                    <h1>Player 1</h1>
+                    <p>0</p>
+                </div>
+                <div class="player-2-score">
+                    <h1>Player 2</h1>
+                    <p>0</p>
+                </div>
+
+            </div>
+            <button id="restart">Restart</button>
         </div>
     </div>
 </body>
