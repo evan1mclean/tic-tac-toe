@@ -99,6 +99,10 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 4rem;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 
 .tile:nth-child(n + 4) {
