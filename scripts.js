@@ -14,6 +14,9 @@ const Player = function (sign, type) {
     const getScore = () => {
         return score;
     }
+    const resetScore = () => {
+        score = 0;
+    };
     const setMoveIndex = (index) => {
         playerMoves.push(index);
     };
@@ -30,26 +33,27 @@ const Player = function (sign, type) {
         setMoveIndex,
         getMoveIndex,
         resetMoveIndex,
+        resetScore,
     };
 };
 
-/* const settingsScreen = (function() {
+/* const selectScreen = (function() {
 
 })();
  */
 
 //creates a module for the game screen
-const gameScreen = (function() {
+const GameScreen = (function() {
     //instantiates game screen variables
-    const player1 = Player("X", "Human");
-    const player2 = Player("O", "Human");
+    let player1 = Player("X", "Human");
+    let player2 = Player("O", "Human");
     let player1Turn = true;
     const tile = document.querySelectorAll(".tile");
 
     //function for rendering player clicks onto the game board
     const renderGameBoard = () => {
         let i = 0;
-        const gameboard = gameBoard.getGameBoard();
+        const gameboard = GameBoard.getGameBoard();
         gameboard.forEach(element => {
             document.querySelector(`[data-index="${i}"]`).textContent = element;
             i++;
@@ -57,27 +61,44 @@ const gameScreen = (function() {
     };
 
     //module for adding/removing the event listeners
-    const eventListeners = (function() {
-        const add = () => {
+    const EventListeners = (function() {
+        const addGameBoard = () => {
             tile.forEach(square => {
-                square.addEventListener("click", game.playRound);
+                square.addEventListener("click", Game.playRound);
             });
         };
 
-        const remove = () => {
+        //clicking restart button will reset values, hide the game screen and bring
+        //back the select screen
+        const restartButton = () => {
+            const btn = document.getElementById("restart");
+            const gameScreen = document.querySelector(".game-content-screen");
+            const selectScreen = document.querySelector(".player-select-screen");
+            btn.addEventListener("click", function() {
+                /* player1 = "";
+                player2 = ""; */
+                Game.resetGame();
+                Scoreboard.updateScoreboard();
+                gameScreen.classList.add("hidden");
+                selectScreen.classList.remove("hidden");
+            });
+        };
+
+        const removeGameBoard = () => {
             tile.forEach(square => {
-                square.removeEventListener("click", game.playRound);
+                square.removeEventListener("click", Game.playRound);
             });
         };
 
         return {
-            add,
-            remove,
+            addGameBoard,
+            removeGameBoard,
+            restartButton
         }
     })();
 
     //Module for creating the game board
-    const gameBoard = (function () {
+    const GameBoard = (function () {
         let board = ["", "", "", "", "", "", "", "", ""];
         const setValue = (index, sign) => {
             board[index] = sign;
@@ -91,9 +112,21 @@ const gameScreen = (function() {
         return {getGameBoard, setValue, resetGameBoard};
     })();
 
+    const Scoreboard = (function () {
+        const player1Score = document.querySelector(".player-1-score p");
+        const player2Score = document.querySelector(".player-2-score p");
+
+        const updateScoreboard = () => {
+            player1Score.textContent = player1.getScore();
+            player2Score.textContent = player2.getScore();
+        };
+
+        return {updateScoreboard}
+    })();
+
     //Module for handling the game play loop
-    const game = (function () {
-        let board = gameBoard.getGameBoard();
+    const Game = (function () {
+        let board = GameBoard.getGameBoard();
         let win;
         //function for checking if the game is over
         const gameOver = (player) => {
@@ -121,12 +154,11 @@ const gameScreen = (function() {
             //to green on winning squares
             if (checkForWin) {
                 player.incrementScore();
+                Scoreboard.updateScoreboard();
                 win.forEach(element => {
                     document.querySelector(`[data-index="${element}"]`).style.backgroundColor = "#b4edce";
                 });
                 resetGame();
-                console.log("Player Score " + player.getScore());
-                console.log(win);
             }
             else if (!board.includes("")) {
                 for (let i = 0; i <= 8; i++) {
@@ -144,13 +176,13 @@ const gameScreen = (function() {
             player1Turn = true;
             player1.resetMoveIndex();
             player2.resetMoveIndex();
-            eventListeners.remove();
+            EventListeners.removeGameBoard();
             setTimeout(() => {
-                board = gameBoard.resetGameBoard();
+                board = GameBoard.resetGameBoard();
                 tile.forEach(element => {
                     element.style.backgroundColor = "white";
                 });
-                eventListeners.add();
+                EventListeners.addGameBoard();
                 renderGameBoard();
                 }, 2000);
         };
@@ -158,7 +190,7 @@ const gameScreen = (function() {
         //function for handling the moves of a human player
         const humanTurn = (player, index) => {
             player.setMoveIndex(index);
-            gameBoard.setValue(index, player.getSign());
+            GameBoard.setValue(index, player.getSign());
             gameOver(player);
         };
         
@@ -178,8 +210,9 @@ const gameScreen = (function() {
             }
             renderGameBoard();
         };
-        return {playRound};
+        return {playRound, resetGame};
     })();
 
-    eventListeners.add();
+    EventListeners.addGameBoard();
+    EventListeners.restartButton();
 })();
