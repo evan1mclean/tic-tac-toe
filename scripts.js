@@ -128,7 +128,9 @@ const GameScreen = (function() {
     //Module for handling the game play loop
     const Game = (function () {
         let board = GameBoard.getGameBoard();
-        let win;
+        let condition;
+        let win = false;
+        let draw = false;
         //function for checking if the game is over
         const gameOver = (player) => {
             const winConditions = [
@@ -144,14 +146,18 @@ const GameScreen = (function() {
             ];
             //checks if the player moves array contains every element of one of the
             //win conditions
-            let isGameOver = winConditions.some((condition) => {
-                const containsWin = condition.every(element => {
-                    win = condition;
+            let isGameOver = winConditions.some((combination) => {
+                const containsWin = combination.every(element => {
+                    condition = combination;
                     return player.getMoveIndex().includes(element);
                 });
                 return containsWin;
             });
-            if (!board.includes("")) {
+            if (isGameOver) {
+                win = true;
+            }
+            if (!board.includes("") && win === false) {
+                draw = true;
                 isGameOver = true;
             }
             return isGameOver;
@@ -162,15 +168,17 @@ const GameScreen = (function() {
             //increment scores and change background color to green on winning squares
             player.incrementScore();
             Scoreboard.updateScoreboard();
-            win.forEach(element => {
-                document.querySelector(`[data-index="${element}"]`).style.backgroundColor = "#b4edce";
-            });
             //changes color to red if draw occurs
-            if (!board.includes("")) {
+            if (draw) {
                 for (let i = 0; i <= 8; i++) {
                     document.querySelector(`[data-index="${i}"]`).style.backgroundColor = "#EFCED7";
                 }
             };
+            if (win) {
+                condition.forEach(element => {
+                    document.querySelector(`[data-index="${element}"]`).style.backgroundColor = "#b4edce";
+                });
+            }
         };
         //function for resetting the game
         const resetGame = () => {
@@ -195,19 +203,20 @@ const GameScreen = (function() {
             renderGameBoard();
         };
 
+        //function for handling the moves of an easy bot
         const easyBotTurn = (player) => {
-            let possibleMoves = availableMoves();
+            let possibleMoves = availableMoves(board);
             let index = Math.floor(Math.random() * possibleMoves.length);
-            player.setMoveIndex(index);
+            player.setMoveIndex(possibleMoves[index]);
             GameBoard.setValue(possibleMoves[index], player.getSign());
             renderGameBoard();
         };
 
         //function for finding what possible moves are left
-        const availableMoves = () => {
+        const availableMoves = (newBoard) => {
             let possibleMoves = [];
             let i = 0;
-            board.forEach(element => {
+            newBoard.forEach(element => {
                 if (element === "") {
                     possibleMoves.push(i);
                 }
@@ -216,9 +225,9 @@ const GameScreen = (function() {
             return possibleMoves;
         };
 
-       /*  const minimax = (newBoard, player) => {
+        const minimax = (newBoard, player) => {
             let possibleMoves = availableMoves();
-        }; */
+        };
          
         //function to handle the logic for 1 round of tic tac toe
         const playRound = (e) => {
