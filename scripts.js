@@ -46,7 +46,7 @@ const Player = function (sign, type) {
 const GameScreen = (function() {
     //instantiates game screen variables
     let player1 = Player("X", "Human");
-    let player2 = Player("O", "Human");
+    let player2 = Player("O", "Bot");
     let player1Turn = true;
     const tile = document.querySelectorAll(".tile");
 
@@ -68,6 +68,12 @@ const GameScreen = (function() {
             });
         };
 
+        const removeGameBoard = () => {
+            tile.forEach(square => {
+                square.removeEventListener("click", Game.playRound);
+            });
+        };
+
         //clicking restart button will reset values, hide the game screen and bring
         //back the select screen
         const restartButton = () => {
@@ -81,12 +87,6 @@ const GameScreen = (function() {
                 Scoreboard.updateScoreboard();
                 gameScreen.classList.add("hidden");
                 selectScreen.classList.remove("hidden");
-            });
-        };
-
-        const removeGameBoard = () => {
-            tile.forEach(square => {
-                square.removeEventListener("click", Game.playRound);
             });
         };
 
@@ -112,6 +112,7 @@ const GameScreen = (function() {
         return {getGameBoard, setValue, resetGameBoard};
     })();
 
+    //Module for handling the scoreboard
     const Scoreboard = (function () {
         const player1Score = document.querySelector(".player-1-score p");
         const player2Score = document.querySelector(".player-2-score p");
@@ -143,34 +144,34 @@ const GameScreen = (function() {
             ];
             //checks if the player moves array contains every element of one of the
             //win conditions
-            let checkForWin = winConditions.some((condition) => {
+            let isGameOver = winConditions.some((condition) => {
                 const containsWin = condition.every(element => {
                     win = condition;
                     return player.getMoveIndex().includes(element);
                 });
                 return containsWin;
             });
-            //if win condition is met, increment scores and change background color
-            //to green on winning squares
-            if (checkForWin) {
-                player.incrementScore();
-                Scoreboard.updateScoreboard();
-                win.forEach(element => {
-                    document.querySelector(`[data-index="${element}"]`).style.backgroundColor = "#b4edce";
-                });
-                resetGame();
+            if (!board.includes("")) {
+                isGameOver = true;
             }
-            else if (!board.includes("")) {
+            return isGameOver;
+        };
+
+        //function for displaying the winning combination or if a draw happens
+        const displayWinner = (player) => {
+            //increment scores and change background color to green on winning squares
+            player.incrementScore();
+            Scoreboard.updateScoreboard();
+            win.forEach(element => {
+                document.querySelector(`[data-index="${element}"]`).style.backgroundColor = "#b4edce";
+            });
+            //changes color to red if draw occurs
+            if (!board.includes("")) {
                 for (let i = 0; i <= 8; i++) {
                     document.querySelector(`[data-index="${i}"]`).style.backgroundColor = "#EFCED7";
                 }
-                resetGame();
-            }
-            else {
-                return;
-            }
+            };
         };
-
         //function for resetting the game
         const resetGame = () => {
             player1Turn = true;
@@ -191,25 +192,85 @@ const GameScreen = (function() {
         const humanTurn = (player, index) => {
             player.setMoveIndex(index);
             GameBoard.setValue(index, player.getSign());
-            gameOver(player);
+            renderGameBoard();
         };
-        
+
+        const easyBotTurn = (player) => {
+            let possibleMoves = availableMoves();
+            let index = Math.floor(Math.random() * possibleMoves.length);
+            player.setMoveIndex(index);
+            GameBoard.setValue(possibleMoves[index], player.getSign());
+            renderGameBoard();
+        };
+
+        //function for finding what possible moves are left
+        const availableMoves = () => {
+            let possibleMoves = [];
+            let i = 0;
+            board.forEach(element => {
+                if (element === "") {
+                    possibleMoves.push(i);
+                }
+                i++;
+            });
+            return possibleMoves;
+        };
+
+       /*  const minimax = (newBoard, player) => {
+            let possibleMoves = availableMoves();
+        }; */
+         
         //function to handle the logic for 1 round of tic tac toe
         const playRound = (e) => {
             let index = Number(e.target.dataset.index);
-            if (board[index] != "") {
-                return;
+            //handles the logic if player 2 is human
+            if (player2.getPlayerType() === "Human") {
+                if (board[index] != "") {
+                    return;
+                }
+                if (player1Turn) {
+                    player1Turn = false;
+                    humanTurn(player1, index);
+                    if (gameOver(player1)) {
+                        displayWinner(player1);
+                        resetGame();
+                        return;
+                    }
+                }
+                else {
+                    player1Turn = true;
+                    humanTurn(player2, index);
+                    if (gameOver(player2)) {
+                        displayWinner(player2);
+                        resetGame();
+                        return;
+                    }
+                }
             }
-            if (player1Turn) {
-                player1Turn = false;
-                humanTurn(player1, index);
-            }
+            //handles the logic if player 2 is a bot
             else {
-                player1Turn = true;
-                humanTurn(player2, index);
+                if (board[index] != "") {
+                    return;
+                }
+                humanTurn(player1, index);
+                EventListeners.removeGameBoard();
+                if (gameOver(player1)) {
+                    displayWinner(player1);
+                    resetGame();
+                    return;
+                }
+                setTimeout(() => {
+                    easyBotTurn(player2);
+                    EventListeners.addGameBoard();
+                    if (gameOver(player2)) {
+                        displayWinner(player2);
+                        resetGame();
+                        return;
+                    }
+                }, 500);
             }
-            renderGameBoard();
         };
+
         return {playRound, resetGame};
     })();
 
