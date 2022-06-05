@@ -66,10 +66,19 @@ body {
 
 .player-choice {
     display: flex;
-    gap: 30px;
+    gap: 40px;
 }
 
 .player-choice button {
+    background-color: #CEE0EF;
+}
+
+.bot-difficulty {
+    display: flex;
+    gap: 5px;
+}
+
+.bot-difficulty button {
     background-color: #CEE0EF;
 }
 
