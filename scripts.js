@@ -28,7 +28,10 @@ const Player = function (sign, type, difficulty) {
     };
 };
 
+//Module for controlling the player 2 select screen
 const SelectScreen = (function() {
+
+    //cache the dom elements and stores a placeholder player2 variable.
     const botBtn = document.getElementById("botButton");
     const humanBtn = document.getElementById("humanButton");
     const startBtn = document.getElementById("startGameButton");
@@ -38,6 +41,7 @@ const SelectScreen = (function() {
     const gameScreen = document.querySelector(".game-content-screen");
     let player2;
 
+    //function for toggling the bot opponent button
     const botButton = () => {
         if (isButtonActive("botButton")) {
             return;
@@ -49,6 +53,7 @@ const SelectScreen = (function() {
         }
     };
 
+    //function for toggling the human opponent button
     const humanButton = () => {
         if (isButtonActive("humanButton")) {
             return;
@@ -61,16 +66,19 @@ const SelectScreen = (function() {
         }
     };
 
+    //function to handle the start button functionality
     const startButton = () => {
         if (isButtonActive("humanButton") || isButtonActive("botButton")) {
             player2 = setPlayer2();
             GameScreen.gameInit();
+            //hides select screen page and shows game screen
             selectScreen.classList.toggle("hidden");
             gameScreen.classList.toggle("hidden");
         }
         else {
             return;
         }
+        //resets the select screen to defaults
         if (!difficultyContainer.classList.contains("hidden")) {
             difficultyContainer.classList.toggle("hidden");
             difficultySlider.value = 0;
@@ -79,6 +87,7 @@ const SelectScreen = (function() {
         
     };
 
+    //function to deselect all selected buttons
     const toggleButtonOff = () => {
         let selected = document.querySelectorAll('button');
         selected.forEach((button) => {
@@ -99,6 +108,7 @@ const SelectScreen = (function() {
         }
     }
 
+    //sets player2 type based on what button is selected
     const setPlayer2 = () => {
         if (isButtonActive("humanButton")) {
             return Player("O", "Human");
@@ -112,6 +122,7 @@ const SelectScreen = (function() {
         }
     }
 
+    //returns player 2 object
     const getPlayer2 = () => {
         return player2;
     };
@@ -266,6 +277,7 @@ const GameScreen = (function() {
                 });
             }
         };
+
         //function for resetting the game
         const resetGame = () => {
             player1Turn = true;
@@ -383,6 +395,7 @@ const GameScreen = (function() {
          
         //function to handle the logic for 1 round of tic tac toe
         const playRound = (e) => {
+            //gets player2 object from select screen
             player2 = SelectScreen.getPlayer2();
             let index = Number(e.target.dataset.index);
             //handles the logic if player 2 is human
@@ -436,6 +449,7 @@ const GameScreen = (function() {
         return {playRound, resetGame};
     })();
 
+    //function that will be accessible by the player select screen to start the game
     const gameInit = () => {
         EventListeners.addGameBoard();
     };
