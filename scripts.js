@@ -181,7 +181,9 @@ const GameScreen = (function() {
             const gameScreen = document.querySelector(".game-content-screen");
             const selectScreen = document.querySelector(".player-select-screen");
             btn.addEventListener("click", function() {
-                player2 = "";
+                let player2 = SelectScreen.getPlayer2();
+                player1.resetScore();
+                player2.resetScore();
                 Game.resetGame();
                 updateScoreboard();
                 gameScreen.classList.add("hidden");
