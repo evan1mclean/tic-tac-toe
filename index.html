@@ -22,10 +22,9 @@
                 <button id="botButton">Bot</button>
                 <button id="humanButton">Human</button>
             </div>
-            <div class="bot-difficulty">
-                <button id="easy">Easy</button>
-                <button id="medium">Medium</button>
-                <button id="hard">Hard</button>
+            <div class="bot-difficulty hidden">
+                <label for="difficultySlider">Easier — Harder</label>
+                <input type="range" id="difficultySlider" min="0" max="100" step="25" value="0">
             </div>
             <button id="startGameButton">Start Game</button>
         </div>

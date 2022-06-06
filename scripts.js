@@ -1,5 +1,5 @@
 //Factory function for creating Player objects
-const Player = function (sign, type) {
+const Player = function (sign, type, difficulty) {
     let score = 0;
     const getPlayerType = () => {
         return type;
@@ -16,26 +16,67 @@ const Player = function (sign, type) {
     const resetScore = () => {
         score = 0;
     };
+    const getDifficulty = () => {
+        return difficulty;
+    };
     return {getSign,
         getPlayerType,
         incrementScore,
         getScore,
         resetScore,
+        getDifficulty,
     };
 };
 
-/* const selectScreen = (function() {
-    let choiceSelected = false;
+const SelectScreen = (function() {
+    const botBtn = document.getElementById("botButton");
+    const humanBtn = document.getElementById("humanButton");
+    const startBtn = document.getElementById("startGameButton");
+    const difficultyContainer = document.querySelector(".bot-difficulty");
+    const difficultySlider = document.getElementById("difficultySlider");
+    const selectScreen = document.querySelector(".player-select-screen");
+    const gameScreen = document.querySelector(".game-content-screen");
+    let player2;
+
     const botButton = () => {
-        const btn = document.getElementById("botButton");
+        if (isButtonActive("botButton")) {
+            return;
+        }
+        botBtn.classList.toggle("selected");
+        difficultyContainer.classList.toggle("hidden");
+        if (isButtonActive("humanButton")) {
+            humanBtn.classList.toggle("selected");
+        }
     };
 
     const humanButton = () => {
-        const btn = document.getElementById("humanButton");
+        if (isButtonActive("humanButton")) {
+            return;
+        }
+        humanBtn.classList.toggle("selected");
+        if (isButtonActive("botButton")) {
+            botBtn.classList.toggle("selected");
+            difficultySlider.value = 0;
+            difficultyContainer.classList.toggle("hidden");
+        }
     };
 
     const startButton = () => {
-        const btn = document.getElementById("startGameButton");
+        if (isButtonActive("humanButton") || isButtonActive("botButton")) {
+            player2 = setPlayer2();
+            GameScreen.gameInit();
+            selectScreen.classList.toggle("hidden");
+            gameScreen.classList.toggle("hidden");
+        }
+        else {
+            return;
+        }
+        if (!difficultyContainer.classList.contains("hidden")) {
+            difficultyContainer.classList.toggle("hidden");
+            difficultySlider.value = 0;
+        }
+        toggleButtonOff();
+        
     };
 
     const toggleButtonOff = () => {
@@ -46,13 +87,46 @@ const Player = function (sign, type) {
             }
         })
     }
-})(); */
+
+    //Function to check if toggleable button is currently active
+    const isButtonActive = (button) => {
+        let btn = document.querySelector(`#${button}`);
+        if (btn.classList.contains('selected')) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    const setPlayer2 = () => {
+        if (isButtonActive("humanButton")) {
+            return Player("O", "Human");
+        }
+        else if (isButtonActive("botButton")) {
+            let percentage = Number(difficultySlider.value);
+            return Player("O", "Bot", percentage);
+        }
+        else {
+            return;
+        }
+    }
+
+    const getPlayer2 = () => {
+        return player2;
+    };
+
+    botBtn.addEventListener("click", botButton);
+    humanBtn.addEventListener("click", humanButton);
+    startBtn.addEventListener("click", startButton);
+
+    return {getPlayer2}
+})();
 
 //creates a module for the game screen
 const GameScreen = (function() {
     //instantiates game screen variables
     let player1 = Player("X", "Human");
-    let player2 = Player("O", "Bot");
     let player1Turn = true;
     const tile = document.querySelectorAll(".tile");
 
@@ -66,8 +140,17 @@ const GameScreen = (function() {
         });
     };
 
+    //function for handling the scoreboard
+    const updateScoreboard = () => {
+        let player2 = SelectScreen.getPlayer2();
+        const player1Score = document.querySelector(".player-1-score p");
+        const player2Score = document.querySelector(".player-2-score p");
+        player1Score.textContent = player1.getScore();
+        player2Score.textContent = player2.getScore();
+    };
+
     //module for adding/removing the event listeners
-    const EventListeners = (function() {
+    const EventListeners = (function(player) {
         const addGameBoard = () => {
             tile.forEach(square => {
                 square.addEventListener("click", Game.playRound);
@@ -89,7 +172,7 @@ const GameScreen = (function() {
             btn.addEventListener("click", function() {
                 player2 = "";
                 Game.resetGame();
-                Scoreboard.updateScoreboard();
+                updateScoreboard();
                 gameScreen.classList.add("hidden");
                 selectScreen.classList.remove("hidden");
             });
@@ -117,25 +200,13 @@ const GameScreen = (function() {
         return {getGameBoard, setValue, resetGameBoard};
     })();
 
-    //Module for handling the scoreboard
-    const Scoreboard = (function () {
-        const player1Score = document.querySelector(".player-1-score p");
-        const player2Score = document.querySelector(".player-2-score p");
-
-        const updateScoreboard = () => {
-            player1Score.textContent = player1.getScore();
-            player2Score.textContent = player2.getScore();
-        };
-
-        return {updateScoreboard}
-    })();
-
     //Module for handling the game play loop
     const Game = (function () {
         let gameboard = GameBoard.getGameBoard();
         let condition;
         let win = false;
         let draw = false;
+        let player2;
         
         //function for checking if the game is over
         const isGameOver = (player, board) => {
@@ -189,7 +260,7 @@ const GameScreen = (function() {
             //increment scores and change background color to green on winning squares
             if (win) {
                 player.incrementScore();
-                Scoreboard.updateScoreboard();
+                updateScoreboard();
                 condition.forEach(element => {
                     document.querySelector(`[data-index="${element}"]`).style.backgroundColor = "#b4edce";
                 });
@@ -312,6 +383,7 @@ const GameScreen = (function() {
          
         //function to handle the logic for 1 round of tic tac toe
         const playRound = (e) => {
+            player2 = SelectScreen.getPlayer2();
             let index = Number(e.target.dataset.index);
             //handles the logic if player 2 is human
             if (player2.getPlayerType() === "Human") {
@@ -321,7 +393,7 @@ const GameScreen = (function() {
                 if (player1Turn) {
                     player1Turn = false;
                     humanTurn(player1, index);
-                    if (isGameOver(player1)) {
+                    if (isGameOver(player1, gameboard)) {
                         displayWinner(player1);
                         resetGame();
                         return;
@@ -330,7 +402,7 @@ const GameScreen = (function() {
                 else {
                     player1Turn = true;
                     humanTurn(player2, index);
-                    if (isGameOver(player2)) {
+                    if (isGameOver(player2, gameboard)) {
                         displayWinner(player2);
                         resetGame();
                         return;
@@ -350,7 +422,7 @@ const GameScreen = (function() {
                     return;
                 }
                 setTimeout(() => {
-                    botTurn(player2, 100);
+                    botTurn(player2, player2.getDifficulty());
                     EventListeners.addGameBoard();
                     if (isGameOver(player2, gameboard)) {
                         displayWinner(player2);
@@ -364,6 +436,11 @@ const GameScreen = (function() {
         return {playRound, resetGame};
     })();
 
-    EventListeners.addGameBoard();
+    const gameInit = () => {
+        EventListeners.addGameBoard();
+    };
+
     EventListeners.restartButton();
+
+    return {gameInit}
 })();
