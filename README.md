@@ -1,6 +1,6 @@
 # Tic Tac Toe
 
-This is an app created with HTML, CSS, and vanilla JavaScript to draw play tic tac toe vs human or a bot.
+This is an app created with HTML, CSS, and vanilla JavaScript to play tic tac toe vs human or a bot.
 
 This app features
 - Settings screen for picking player 2
