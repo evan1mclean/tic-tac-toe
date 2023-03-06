@@ -5,7 +5,7 @@ This is an app created with HTML, CSS, and vanilla JavaScript to play tic tac to
 This app features
 - Settings screen for picking player 2
 - Human Opponent
-- Computer Opponent an AI slider
+- Computer Opponent and a AI difficulty slider
 - AI slider ranges from playing completely random moves to being unbeatable
 - AI uses the Minimax algorithm
 - Scoreboard
